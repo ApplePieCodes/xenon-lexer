@@ -6,7 +6,7 @@ edition = "2024"
 description = "The Lexical Analyzer (Lexer) for the Xenon Programming Language."
 repository = "https://github.com/ApplePieCodes/xenon-lexer"
 license = "Unlicense"
-keywords = ['lexer', 'lexing', 'xenon', 'programming-languages', 'modular']
+keywords = ['lexer', 'lexing', 'xenon', 'programming-language', 'modular']
 categories = ['compilers', 'development-tools', 'parsing', 'text-processing']
 
 [lints.rust]
