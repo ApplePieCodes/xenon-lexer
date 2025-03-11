@@ -1,19 +1,22 @@
 use std::{fmt::Display, vec};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Default)]
 pub enum LexError {
     UnknownSymbol,
+    #[default]
+    Unknown
 }
 impl Display for LexError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LexError::UnknownSymbol => write!(f, "Unknown symbol encountered").expect("Should pass a formatter")
+            LexError::UnknownSymbol => write!(f, "Unknown symbol encountered").expect("Should pass a formatter"),
+            LexError::Unknown => write!(f, "Unknown Error").expect("Should pass a formatter")
         }
         Ok(())
     }
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub enum TokenType {
     // Literals
     IntegerLiteral,
