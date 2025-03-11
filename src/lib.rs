@@ -1,6 +1,6 @@
 use std::{fmt::Display, vec};
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum LexError {
     UnknownSymbol,
     #[default]
@@ -16,7 +16,7 @@ impl Display for LexError {
     }
 }
 
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum TokenType {
     // Literals
     IntegerLiteral,
@@ -57,7 +57,7 @@ pub enum TokenType {
     Unknown,
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, PartialEq, Eq)]
 pub struct Token {
     pub value: String,
     pub ttype: TokenType,
