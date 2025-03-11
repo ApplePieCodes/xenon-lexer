@@ -6,7 +6,7 @@ pub enum LexError {
 }
 impl LexError {
     pub fn to_string(self) -> String {
-        return format!("LexError: {:#?}", self);
+        format!("LexError: {:#?}", self)
     }
 }
 
