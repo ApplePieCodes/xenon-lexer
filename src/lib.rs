@@ -29,6 +29,10 @@ pub enum TokenType {
     True,
     False,
     Return,
+    Public,
+    Private,
+    Module,
+    Let,
 
     // Symbols
     OpenParen,
@@ -50,6 +54,8 @@ pub enum TokenType {
     Less,
     GreaterEqual,
     LessEqual,
+    Arrow,
+    Colon,
 
     // Other
     #[default]
@@ -108,6 +114,22 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                 }
                 "return" => {
                     token.ttype = TokenType::Return;
+                    token.value = buffer.clone();
+                }
+                "public" => {
+                    token.ttype = TokenType::Public;
+                    token.value = buffer.clone();
+                }
+                "private" => {
+                    token.ttype = TokenType::Private;
+                    token.value = buffer.clone();
+                }
+                "module" => {
+                    token.ttype = TokenType::Module;
+                    token.value = buffer.clone();
+                }
+                "let" => {
+                    token.ttype = TokenType::Let;
                     token.value = buffer.clone();
                 }
                 _ => {
@@ -179,8 +201,13 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                     i += 1;
                 }
                 '-' => {
-                    token.ttype = TokenType::Minus;
-                    i += 1;
+                    if i + 1 < code.len() && code[i + 1] == '>' {
+                        token.ttype = TokenType::Arrow;
+                        i += 2;
+                    } else {
+                        token.ttype = TokenType::Minus;
+                        i += 1;
+                    }
                 }
                 '*' => {
                     token.ttype = TokenType::Star;
@@ -224,6 +251,10 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                         token.ttype = TokenType::Greater;
                         i += 1;
                     }
+                }
+                ':' => {
+                    token.ttype = TokenType::Colon;
+                    i += 1;
                 }
                 _ => {
                     return Result::Err(LexError::UnknownSymbol);

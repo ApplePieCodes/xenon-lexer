@@ -1,6 +1,6 @@
 [package]
 name = "xenon-lexer"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Liam Greenway <lgr33nway@gmail.com>"]
 edition = "2024"
 description = "The Lexical Analyzer (Lexer) for the Xenon Programming Language."
