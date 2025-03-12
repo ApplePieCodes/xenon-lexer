@@ -56,6 +56,10 @@ pub enum TokenType {
     LessEqual,
     Arrow,
     Colon,
+    Bang,
+    ShBang,
+    And,
+    Or,
 
     // Other
     #[default]
@@ -252,6 +256,37 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                         i += 1;
                     }
                 }
+                '#' => {
+                    if i + 1 < code.len() && code[i + 1] == '!' {
+                        token.ttype = TokenType::ShBang;
+                        i += 2;
+                    }
+                    else {
+                        return Result::Err(LexError::UnknownSymbol);
+                    }
+                }
+                '!' => {
+                    token.ttype = TokenType::Bang;
+                    i += 1;
+                }
+                '&' => {
+                    if i + 1 < code.len() && code[i + 1] == '&' {
+                        token.ttype = TokenType::And;
+                        i += 2;
+                    }
+                    else {
+                        return Result::Err(LexError::UnknownSymbol);
+                    }
+                }
+                '|' => {
+                    if i + 1 < code.len() && code[i + 1] == '|' {
+                        token.ttype = TokenType::Or;
+                        i += 2;
+                    }
+                    else {
+                        return Result::Err(LexError::UnknownSymbol);
+                    }
+                }
                 ':' => {
                     token.ttype = TokenType::Colon;
                     i += 1;
@@ -281,10 +316,14 @@ mod tests {
                     }",
         );
 
-        match tokens {
+        match tokens.clone() {
             Ok(t) => assert!(t.len() == 9),
             Err(e) => panic!("{}", e.to_string()),
         }
+        let boxed_arr: Box<[Token]> = tokens.clone().unwrap().try_into().unwrap();
+        assert!(boxed_arr[0] == Token { value: "void".to_string(), ttype: TokenType::Identifier, line: 1});
+        assert!(boxed_arr[1] == Token { value: "main".to_string(), ttype: TokenType::Identifier, line: 1});
+        assert!(boxed_arr[2] == Token { value: "".to_string(), ttype: TokenType::OpenParen, line: 1});
     }
 
     #[test]
