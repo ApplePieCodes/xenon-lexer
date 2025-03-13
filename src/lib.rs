@@ -16,7 +16,7 @@ impl Display for LexError {
     }
 }
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub enum TokenType {
     // Literals
     IntegerLiteral,
@@ -67,7 +67,7 @@ pub enum TokenType {
     Unknown,
 }
 
-#[derive(Clone, Default, PartialEq, Eq)]
+#[derive(Clone, Default, PartialEq, Eq, Debug, PartialOrd, Ord)]
 pub struct Token {
     pub value: String,
     pub ttype: TokenType,
