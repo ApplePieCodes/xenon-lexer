@@ -32,6 +32,7 @@ pub enum TokenType {
     Public,
     Private,
     Module,
+    Fn,
     Let,
 
     // Symbols
@@ -134,6 +135,10 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                 }
                 "let" => {
                     token.ttype = TokenType::Let;
+                    token.value = buffer.clone();
+                }
+                "fn" => {
+                    token.ttype = TokenType::Fn;
                     token.value = buffer.clone();
                 }
                 _ => {
