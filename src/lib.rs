@@ -3,6 +3,7 @@ use std::{fmt::Display, vec};
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum LexError {
     UnknownSymbol,
+    UnexpectedEof,
     #[default]
     Unknown
 }
@@ -10,6 +11,7 @@ impl Display for LexError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             LexError::UnknownSymbol => write!(f, "Unknown symbol encountered").expect("Should pass a formatter"),
+            LexError::UnexpectedEof => write!(f, "Unexpected End-of-File").expect("Should pass a formatter"),
             LexError::Unknown => write!(f, "Unknown Error").expect("Should pass a formatter")
         }
         Ok(())
@@ -224,11 +226,32 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                 }
                 '/' => {
                     if i + 1 < code.len() && code[i + 1] == '/' {
-                        while code[i] != '\n' {
+                        while i < code.len() && code[i] != '\n' {
                             i += 1;
                         }
                         line += 1;
                         i += 1;
+                        continue;
+                    }
+                    else if i + 1 < code.len() && code[i + 1] == '*' {
+                        i+=2;
+                        loop {
+                            if i < code.len() && code[i] != '*' {
+                                i+=1;
+                                continue;
+                            }
+                            else {
+                                if i + 1 >= code.len() {
+                                    return Err(LexError::UnexpectedEof);
+                                }
+                                else {
+                                    if code[i + 1] == '/' {
+                                        i+=2;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                         continue;
                     }
                     token.ttype = TokenType::Divide;
@@ -317,18 +340,32 @@ mod tests {
     fn xenon_code() {
         let tokens = tokenize(
             "void main() {
+                        let i = 0;
+                        // i am a comment
+                        /* I am a multi-line comment*/
                         return 0;
                     }",
         );
 
         match tokens.clone() {
-            Ok(t) => assert!(t.len() == 9),
+            Ok(t) => assert!(t.len() == 14),
             Err(e) => panic!("{}", e.to_string()),
         }
         let boxed_arr: Box<[Token]> = tokens.clone().unwrap().try_into().unwrap();
         assert!(boxed_arr[0] == Token { value: "void".to_string(), ttype: TokenType::Identifier, line: 1});
         assert!(boxed_arr[1] == Token { value: "main".to_string(), ttype: TokenType::Identifier, line: 1});
         assert!(boxed_arr[2] == Token { value: "".to_string(), ttype: TokenType::OpenParen, line: 1});
+        assert!(boxed_arr[3] == Token { value: "".to_string(), ttype: TokenType::CloseParen, line: 1});
+        assert!(boxed_arr[4] == Token { value: "".to_string(), ttype: TokenType::OpenCurly, line: 1});
+        assert!(boxed_arr[5] == Token { value: "let".to_string(), ttype: TokenType::Let, line: 2});
+        assert!(boxed_arr[6] == Token { value: "i".to_string(), ttype: TokenType::Identifier, line: 2});
+        assert!(boxed_arr[7] == Token { value: "".to_string(), ttype: TokenType::Equals, line: 2});
+        assert!(boxed_arr[8] == Token { value: "0".to_string(), ttype: TokenType::IntegerLiteral, line: 2});
+        assert!(boxed_arr[9] == Token { value: "".to_string(), ttype: TokenType::Semicolon, line: 2});
+        assert!(boxed_arr[10] == Token { value: "return".to_string(), ttype: TokenType::Return, line: 5});
+        assert!(boxed_arr[11] == Token { value: "0".to_string(), ttype: TokenType::IntegerLiteral, line: 5});
+        assert!(boxed_arr[12] == Token { value: "".to_string(), ttype: TokenType::Semicolon, line: 5});
+        assert!(boxed_arr[13] == Token { value: "".to_string(), ttype: TokenType::CloseCurly, line: 6       });
     }
 
     #[test]
