@@ -34,6 +34,20 @@ pub enum TokenType {
     Module,
     Fn,
     Let,
+    If,
+    Else,
+    While,
+    For,
+    Loop,
+    Struct,
+    Impliment,
+    Enum,
+    Unsafe,
+    ASM,
+    Trait,
+    Switch,
+    Async,
+
 
     // Symbols
     OpenParen,
@@ -139,6 +153,58 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                 }
                 "fn" => {
                     token.ttype = TokenType::Fn;
+                    token.value = buffer.clone();
+                }
+                "if" => {
+                    token.ttype = TokenType::If;
+                    token.value = buffer.clone();
+                }
+                "else" => {
+                    token.ttype = TokenType::Else;
+                    token.value = buffer.clone();
+                }
+                "while" => {
+                    token.ttype = TokenType::While;
+                    token.value = buffer.clone();
+                }
+                "for" => {
+                    token.ttype = TokenType::For;
+                    token.value = buffer.clone();
+                }
+                "loop" => {
+                    token.ttype = TokenType::Loop;
+                    token.value = buffer.clone();
+                }
+                "struct" => {
+                    token.ttype = TokenType::Struct;
+                    token.value = buffer.clone();
+                }
+                "impliment" => {
+                    token.ttype = TokenType::Impliment;
+                    token.value = buffer.clone();
+                }
+                "enum" => {
+                    token.ttype = TokenType::Enum;
+                    token.value = buffer.clone();
+                }
+                "unsafe" => {
+                    token.ttype = TokenType::Unsafe;
+                    token.value = buffer.clone();
+                }
+                "asm" => {
+                    token.ttype = TokenType::ASM;
+                    token.value = buffer.clone();
+                }
+                "trait" => {
+                    token.ttype = TokenType::Trait;
+                    token.value = buffer.clone();
+                }
+                "switch" => {
+                    token.ttype = TokenType::Switch;
+                    token.value = buffer.clone();
+                }
+                "async" => {
+                    token.ttype = TokenType::Async;
                     token.value = buffer.clone();
                 }
                 _ => {
