@@ -81,6 +81,7 @@ pub enum TokenType {
     And,
     Or,
     Dot,
+    Comma,
 
     // Other
     #[default]
@@ -256,6 +257,10 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
             match code[i] {
                 '.' => {
                     token.ttype = TokenType::Dot;
+                    i += 1;
+                }
+                ',' => {
+                    token.ttype = TokenType::Comma;
                     i += 1;
                 }
                 '(' => {
