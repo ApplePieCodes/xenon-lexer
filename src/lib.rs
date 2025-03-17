@@ -5,14 +5,18 @@ pub enum LexError {
     UnknownSymbol,
     UnexpectedEof,
     #[default]
-    Unknown
+    Unknown,
 }
 impl Display for LexError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LexError::UnknownSymbol => write!(f, "Unknown symbol encountered").expect("Should pass a formatter"),
-            LexError::UnexpectedEof => write!(f, "Unexpected End-of-File").expect("Should pass a formatter"),
-            LexError::Unknown => write!(f, "Unknown Error").expect("Should pass a formatter")
+            LexError::UnknownSymbol => {
+                write!(f, "Unknown symbol encountered").expect("Should pass a formatter")
+            }
+            LexError::UnexpectedEof => {
+                write!(f, "Unexpected End-of-File").expect("Should pass a formatter")
+            }
+            LexError::Unknown => write!(f, "Unknown Error").expect("Should pass a formatter"),
         }
         Ok(())
     }
@@ -36,6 +40,19 @@ pub enum TokenType {
     Module,
     Fn,
     Let,
+    If,
+    Else,
+    While,
+    For,
+    Loop,
+    Struct,
+    Impliment,
+    Enum,
+    Unsafe,
+    ASM,
+    Trait,
+    Switch,
+    Async,
 
     // Symbols
     OpenParen,
@@ -88,7 +105,12 @@ impl Token {
 }
 impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Token at line {}: Type {:#?} with value {}", self.line, self.ttype, self.value).expect("Should pass a formatter");
+        write!(
+            f,
+            "Token at line {}: Type {:#?} with value {}",
+            self.line, self.ttype, self.value
+        )
+        .expect("Should pass a formatter");
         Ok(())
     }
 }
@@ -142,6 +164,58 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                 }
                 "fn" => {
                     token.ttype = TokenType::Fn;
+                    token.value = buffer.clone();
+                }
+                "if" => {
+                    token.ttype = TokenType::If;
+                    token.value = buffer.clone();
+                }
+                "else" => {
+                    token.ttype = TokenType::Else;
+                    token.value = buffer.clone();
+                }
+                "while" => {
+                    token.ttype = TokenType::While;
+                    token.value = buffer.clone();
+                }
+                "for" => {
+                    token.ttype = TokenType::For;
+                    token.value = buffer.clone();
+                }
+                "loop" => {
+                    token.ttype = TokenType::Loop;
+                    token.value = buffer.clone();
+                }
+                "struct" => {
+                    token.ttype = TokenType::Struct;
+                    token.value = buffer.clone();
+                }
+                "impliment" => {
+                    token.ttype = TokenType::Impliment;
+                    token.value = buffer.clone();
+                }
+                "enum" => {
+                    token.ttype = TokenType::Enum;
+                    token.value = buffer.clone();
+                }
+                "unsafe" => {
+                    token.ttype = TokenType::Unsafe;
+                    token.value = buffer.clone();
+                }
+                "asm" => {
+                    token.ttype = TokenType::ASM;
+                    token.value = buffer.clone();
+                }
+                "trait" => {
+                    token.ttype = TokenType::Trait;
+                    token.value = buffer.clone();
+                }
+                "switch" => {
+                    token.ttype = TokenType::Switch;
+                    token.value = buffer.clone();
+                }
+                "async" => {
+                    token.ttype = TokenType::Async;
                     token.value = buffer.clone();
                 }
                 _ => {
@@ -237,21 +311,18 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                         line += 1;
                         i += 1;
                         continue;
-                    }
-                    else if i + 1 < code.len() && code[i + 1] == '*' {
-                        i+=2;
+                    } else if i + 1 < code.len() && code[i + 1] == '*' {
+                        i += 2;
                         loop {
                             if i < code.len() && code[i] != '*' {
-                                i+=1;
+                                i += 1;
                                 continue;
-                            }
-                            else {
+                            } else {
                                 if i + 1 >= code.len() {
                                     return Err(LexError::UnexpectedEof);
-                                }
-                                else {
+                                } else {
                                     if code[i + 1] == '/' {
-                                        i+=2;
+                                        i += 2;
                                         break;
                                     }
                                 }
@@ -293,8 +364,7 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                     if i + 1 < code.len() && code[i + 1] == '!' {
                         token.ttype = TokenType::ShBang;
                         i += 2;
-                    }
-                    else {
+                    } else {
                         return Result::Err(LexError::UnknownSymbol);
                     }
                 }
@@ -306,8 +376,7 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                     if i + 1 < code.len() && code[i + 1] == '&' {
                         token.ttype = TokenType::And;
                         i += 2;
-                    }
-                    else {
+                    } else {
                         return Result::Err(LexError::UnknownSymbol);
                     }
                 }
@@ -315,8 +384,7 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                     if i + 1 < code.len() && code[i + 1] == '|' {
                         token.ttype = TokenType::Or;
                         i += 2;
-                    }
-                    else {
+                    } else {
                         return Result::Err(LexError::UnknownSymbol);
                     }
                 }
@@ -357,20 +425,118 @@ mod tests {
             Err(e) => panic!("{}", e.to_string()),
         }
         let boxed_arr: Box<[Token]> = tokens.clone().unwrap().try_into().unwrap();
-        assert!(boxed_arr[0] == Token { value: "void".to_string(), ttype: TokenType::Identifier, line: 1});
-        assert!(boxed_arr[1] == Token { value: "main".to_string(), ttype: TokenType::Identifier, line: 1});
-        assert!(boxed_arr[2] == Token { value: "".to_string(), ttype: TokenType::OpenParen, line: 1});
-        assert!(boxed_arr[3] == Token { value: "".to_string(), ttype: TokenType::CloseParen, line: 1});
-        assert!(boxed_arr[4] == Token { value: "".to_string(), ttype: TokenType::OpenCurly, line: 1});
-        assert!(boxed_arr[5] == Token { value: "let".to_string(), ttype: TokenType::Let, line: 2});
-        assert!(boxed_arr[6] == Token { value: "i".to_string(), ttype: TokenType::Identifier, line: 2});
-        assert!(boxed_arr[7] == Token { value: "".to_string(), ttype: TokenType::Equals, line: 2});
-        assert!(boxed_arr[8] == Token { value: "0".to_string(), ttype: TokenType::IntegerLiteral, line: 2});
-        assert!(boxed_arr[9] == Token { value: "".to_string(), ttype: TokenType::Semicolon, line: 2});
-        assert!(boxed_arr[10] == Token { value: "return".to_string(), ttype: TokenType::Return, line: 5});
-        assert!(boxed_arr[11] == Token { value: "0".to_string(), ttype: TokenType::IntegerLiteral, line: 5});
-        assert!(boxed_arr[12] == Token { value: "".to_string(), ttype: TokenType::Semicolon, line: 5});
-        assert!(boxed_arr[13] == Token { value: "".to_string(), ttype: TokenType::CloseCurly, line: 6       });
+        assert!(
+            boxed_arr[0]
+                == Token {
+                    value: "void".to_string(),
+                    ttype: TokenType::Identifier,
+                    line: 1
+                }
+        );
+        assert!(
+            boxed_arr[1]
+                == Token {
+                    value: "main".to_string(),
+                    ttype: TokenType::Identifier,
+                    line: 1
+                }
+        );
+        assert!(
+            boxed_arr[2]
+                == Token {
+                    value: "".to_string(),
+                    ttype: TokenType::OpenParen,
+                    line: 1
+                }
+        );
+        assert!(
+            boxed_arr[3]
+                == Token {
+                    value: "".to_string(),
+                    ttype: TokenType::CloseParen,
+                    line: 1
+                }
+        );
+        assert!(
+            boxed_arr[4]
+                == Token {
+                    value: "".to_string(),
+                    ttype: TokenType::OpenCurly,
+                    line: 1
+                }
+        );
+        assert!(
+            boxed_arr[5]
+                == Token {
+                    value: "let".to_string(),
+                    ttype: TokenType::Let,
+                    line: 2
+                }
+        );
+        assert!(
+            boxed_arr[6]
+                == Token {
+                    value: "i".to_string(),
+                    ttype: TokenType::Identifier,
+                    line: 2
+                }
+        );
+        assert!(
+            boxed_arr[7]
+                == Token {
+                    value: "".to_string(),
+                    ttype: TokenType::Equals,
+                    line: 2
+                }
+        );
+        assert!(
+            boxed_arr[8]
+                == Token {
+                    value: "0".to_string(),
+                    ttype: TokenType::IntegerLiteral,
+                    line: 2
+                }
+        );
+        assert!(
+            boxed_arr[9]
+                == Token {
+                    value: "".to_string(),
+                    ttype: TokenType::Semicolon,
+                    line: 2
+                }
+        );
+        assert!(
+            boxed_arr[10]
+                == Token {
+                    value: "return".to_string(),
+                    ttype: TokenType::Return,
+                    line: 5
+                }
+        );
+        assert!(
+            boxed_arr[11]
+                == Token {
+                    value: "0".to_string(),
+                    ttype: TokenType::IntegerLiteral,
+                    line: 5
+                }
+        );
+        assert!(
+            boxed_arr[12]
+                == Token {
+                    value: "".to_string(),
+                    ttype: TokenType::Semicolon,
+                    line: 5
+                }
+        );
+        assert!(
+            boxed_arr[13]
+                == Token {
+                    value: "".to_string(),
+                    ttype: TokenType::CloseCurly,
+                    line: 6
+                }
+        );
     }
 
     #[test]
