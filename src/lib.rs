@@ -82,6 +82,8 @@ pub enum TokenType {
     Or,
     Dot,
     Comma,
+    Break,
+    Continue,
 
     // Other
     #[default]
@@ -217,6 +219,14 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                 }
                 "async" => {
                     token.ttype = TokenType::Async;
+                    token.value = buffer.clone();
+                }
+                "break" => {
+                    token.ttype = TokenType::Break;
+                    token.value = buffer.clone();
+                }
+                "continue" => {
+                    token.ttype = TokenType::Continue;
                     token.value = buffer.clone();
                 }
                 _ => {
