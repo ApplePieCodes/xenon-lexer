@@ -63,6 +63,7 @@ pub enum TokenType {
     ShBang,
     And,
     Or,
+    Dot,
 
     // Other
     #[default]
@@ -179,6 +180,10 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
             continue;
         } else {
             match code[i] {
+                '.' => {
+                    token.ttype = TokenType::Dot;
+                    i += 1;
+                }
                 '(' => {
                     token.ttype = TokenType::OpenParen;
                     i += 1;
