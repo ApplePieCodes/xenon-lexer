@@ -43,7 +43,9 @@ pub enum TokenType {
 
     // Operators
     Plus,
+    PlusPlus,
     Minus,
+    MinusMinus,
     Star,
     Divide,
     Equals,

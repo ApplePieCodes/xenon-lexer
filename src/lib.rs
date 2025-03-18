@@ -212,6 +212,9 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                     if i + 1 < code.len() && code[i + 1] == '=' {
                         token.ttype = TokenType::PlusEquals;
                         i += 2;
+                    } else if i + 1 < code.len() && code[i + 1] == '+' {
+                        token.ttype = TokenType::PlusPlus;
+                        i += 1;
                     } else {
                         token.ttype = TokenType::Plus;
                         i += 1;
@@ -220,6 +223,9 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                 '-' => {
                     if i + 1 < code.len() && code[i + 1] == '>' {
                         token.ttype = TokenType::Arrow;
+                        i += 2;
+                    } else if i + 1 < code.len() && code[i + 1] == '-' {
+                        token.ttype = TokenType::MinusMinus;
                         i += 2;
                     } else if i + 1 < code.len() && code[i + 1] == '=' {
                         token.ttype = TokenType::MinusEquals;
