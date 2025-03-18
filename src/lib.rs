@@ -70,6 +70,10 @@ pub enum TokenType {
     Divide,
     Equals,
     EqualsEquals,
+    PlusEquals,
+    MinusEquals,
+    TimesEquals,
+    DivideEquals,
     Greater,
     Less,
     GreaterEqual,
@@ -302,21 +306,36 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                     i += 1;
                 }
                 '+' => {
-                    token.ttype = TokenType::Plus;
-                    i += 1;
+                    if i + 1 < code.len() && code[i + 1] == '=' {
+                        token.ttype = TokenType::PlusEquals;
+                        i += 2;
+                    } else {
+                        token.ttype = TokenType::Plus;
+                        i += 1;
+                    }
                 }
                 '-' => {
                     if i + 1 < code.len() && code[i + 1] == '>' {
                         token.ttype = TokenType::Arrow;
                         i += 2;
-                    } else {
+                    }
+                    else if i + 1 < code.len() && code[i + 1] == '=' {
+                        token.ttype = TokenType::MinusEquals;
+                        i += 2;
+                    } 
+                    else {
                         token.ttype = TokenType::Minus;
                         i += 1;
                     }
                 }
                 '*' => {
-                    token.ttype = TokenType::Star;
-                    i += 1;
+                    if i + 1 < code.len() && code[i + 1] == '=' {
+                        token.ttype = TokenType::TimesEquals;
+                        i += 2;
+                    } else {
+                        token.ttype = TokenType::Star;
+                        i += 1;
+                    }
                 }
                 '/' => {
                     if i + 1 < code.len() && code[i + 1] == '/' {
@@ -345,8 +364,13 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                         }
                         continue;
                     }
-                    token.ttype = TokenType::Divide;
-                    i += 1;
+                    if i + 1 < code.len() && code[i + 1] == '=' {
+                        token.ttype = TokenType::DivideEquals;
+                        i += 2;
+                    } else {
+                        token.ttype = TokenType::Divide;
+                        i += 1;
+                    }
                 }
                 '=' => {
                     if i + 1 < code.len() && code[i + 1] == '=' {
