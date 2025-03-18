@@ -1,4 +1,7 @@
+pub mod token;
+
 use std::{fmt::Display, vec};
+use token::{Token, TokenType};
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub enum LexError {
@@ -18,106 +21,6 @@ impl Display for LexError {
             }
             LexError::Unknown => write!(f, "Unknown Error").expect("Should pass a formatter"),
         }
-        Ok(())
-    }
-}
-
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
-pub enum TokenType {
-    // Literals
-    IntegerLiteral,
-    FloatLiteral,
-    StringLiteral,
-    CharLiteral,
-    Identifier,
-
-    // Keywords
-    True,
-    False,
-    Return,
-    Public,
-    Private,
-    Module,
-    Fn,
-    Let,
-    If,
-    Else,
-    While,
-    For,
-    Loop,
-    Struct,
-    Impliment,
-    Enum,
-    Unsafe,
-    ASM,
-    Trait,
-    Switch,
-    Async,
-
-    // Symbols
-    OpenParen,
-    CloseParen,
-    OpenBracket,
-    CloseBracket,
-    OpenCurly,
-    CloseCurly,
-    Semicolon,
-
-    // Operators
-    Plus,
-    Minus,
-    Star,
-    Divide,
-    Equals,
-    EqualsEquals,
-    PlusEquals,
-    MinusEquals,
-    TimesEquals,
-    DivideEquals,
-    Greater,
-    Less,
-    GreaterEqual,
-    LessEqual,
-    Arrow,
-    Colon,
-    Bang,
-    ShBang,
-    And,
-    Or,
-    Dot,
-    Comma,
-    Break,
-    Continue,
-
-    // Other
-    #[default]
-    None,
-    Unknown,
-}
-
-#[derive(Clone, Default, PartialEq, Eq, Debug, PartialOrd, Ord)]
-pub struct Token {
-    pub value: String,
-    pub ttype: TokenType,
-    pub line: usize,
-}
-impl Token {
-    fn new() -> Token {
-        Token {
-            value: String::new(),
-            ttype: TokenType::None,
-            line: 0,
-        }
-    }
-}
-impl Display for Token {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Token at line {}: Type {:#?} with value {}",
-            self.line, self.ttype, self.value
-        )
-        .expect("Should pass a formatter");
         Ok(())
     }
 }
@@ -318,12 +221,10 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                     if i + 1 < code.len() && code[i + 1] == '>' {
                         token.ttype = TokenType::Arrow;
                         i += 2;
-                    }
-                    else if i + 1 < code.len() && code[i + 1] == '=' {
+                    } else if i + 1 < code.len() && code[i + 1] == '=' {
                         token.ttype = TokenType::MinusEquals;
                         i += 2;
-                    } 
-                    else {
+                    } else {
                         token.ttype = TokenType::Minus;
                         i += 1;
                     }
@@ -351,15 +252,11 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                             if i < code.len() && code[i] != '*' {
                                 i += 1;
                                 continue;
-                            } else {
-                                if i + 1 >= code.len() {
-                                    return Err(LexError::UnexpectedEof);
-                                } else {
-                                    if code[i + 1] == '/' {
-                                        i += 2;
-                                        break;
-                                    }
-                                }
+                            } else if i + 1 >= code.len() {
+                                return Err(LexError::UnexpectedEof);
+                            } else if code[i + 1] == '/' {
+                                i += 2;
+                                break;
                             }
                         }
                         continue;
@@ -416,7 +313,8 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                         token.ttype = TokenType::And;
                         i += 2;
                     } else {
-                        return Result::Err(LexError::UnknownSymbol);
+                        token.ttype = TokenType::GetRef;
+                        i += 1;
                     }
                 }
                 '|' => {
