@@ -61,7 +61,7 @@ pub enum TokenType {
     Arrow,
     Colon,
     Bang,
-    ShBang,
+    Hash,
     And,
     GetRef,
     Or,

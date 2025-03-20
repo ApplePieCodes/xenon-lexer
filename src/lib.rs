@@ -303,12 +303,8 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, LexError> {
                     }
                 }
                 '#' => {
-                    if i + 1 < code.len() && code[i + 1] == '!' {
-                        token.ttype = TokenType::ShBang;
-                        i += 2;
-                    } else {
-                        return Result::Err(LexError::UnknownSymbol);
-                    }
+                    token.ttype = TokenType::Hash;
+                    i += 1;
                 }
                 '!' => {
                     token.ttype = TokenType::Bang;
